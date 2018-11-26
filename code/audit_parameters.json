@@ -1,0 +1,1 @@
+{"num_winners": 2, "o2_rate": 0, "u1_rate": 0, "lambda_step": 0.05, "seed": 12345678901234567890, "risk_limit": 0.05, "stratum_sizes": [100000, 5000], "u2_rate": 0, "o1_rate": 0.002, "n_ratio": 0, "gamma": 1.03905}
