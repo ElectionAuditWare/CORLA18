@@ -15,11 +15,18 @@ from sprt import ballot_polling_sprt
 ############################# Import/export data ###############################
 ################################################################################
 
+def read_audit_parameters(filename):
+    with open(filename, 'r') as f:
+        param = json.load(f)
+        check_valid_audit_parameters(**param)
+        return param
+    return None
+
 def write_audit_parameters(filename, \
                        risk_limit, stratum_sizes, num_winners, seed, gamma, \
                        lambda_step, o1_rate, o2_rate, \
                        u1_rate, u2_rate, n_ratio):
-    param = {"risk_limit" : risk_limit,  
+    param = {"risk_limit" : risk_limit,
              "stratum_sizes": stratum_sizes,
              "num_winners" : num_winners,
              "seed" : seed,
@@ -65,7 +72,7 @@ def write_audit_results(filename, \
 
 def check_valid_audit_parameters(risk_limit, lambda_step, o1_rate, o2_rate,
                                  u1_rate, u2_rate, stratum_sizes, n_ratio,
-                                 num_winners):
+                                 num_winners, seed=None, gamma=None):
     """
     Check that the audit parameters supplied are valid.
     """
@@ -123,7 +130,7 @@ def find_winners_losers(candidates, num_winners):
     Parameters
     ----------
     candidates : dict
-        keys are the candidate name, values are a list with 
+        keys are the candidate name, values are a list with
         [reported votes in CVR stratum, reported votes in no-CVR stratum]
     num_winners : int
         number of winners in the contest
@@ -380,7 +387,7 @@ def estimate_n(N_w1, N_w2, N_l1, N_l2, N1, N2,\
             high_n = mid_n
         else:
             low_n = mid_n
-    
+
     n1 = math.ceil(n_ratio * high_n)
     n2 = math.ceil(high_n - n1)
     return (n1, n2)
@@ -470,7 +477,7 @@ def estimate_escalation_n(N_w1, N_w2, N_l1, N_l2, N1, N2, n1, n2, \
     def try_n(n):
         n1 = math.ceil(n_ratio * n)
         n2 = int(n - n1)
-        
+
         if (n1 < n1_original) or (n2 < n2_original):
             return 1
 
@@ -663,7 +670,7 @@ def audit_contest(candidates, winners, losers, stratum_sizes,\
     Parameters
     ----------
     candidates : dict
-        OrderedDict with candidate names as keys and 
+        OrderedDict with candidate names as keys and
         [CVR votes, no-CVR votes, total votes] as values
     winners : list
         names of winners
@@ -803,7 +810,7 @@ def test_initial_n():
         np.testing.assert_equal(n[0], n[1]+1)
     else:
         np.testing.assert_equal(n[0], n[1])
-    
+
     # sample sizes: n = 55 in each stratum. Should be sufficient.
     chi55 = lambda lam: -2*( np.sum(np.log(200 + 100*lam - np.arange(33))) - \
         np.sum(np.log(300 - np.arange(33))) + np.sum(np.log(300 - 100*lam - \
